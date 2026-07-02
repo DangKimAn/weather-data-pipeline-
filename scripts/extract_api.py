@@ -5,12 +5,21 @@ import requests
 import json 
 import boto3
 import datetime
+import pandas
 dot_env_loc = '../config/.env'
 
+load_dotenv(dot_env_loc)
+access_key = os.getenv('AWS_ACCESS_KEY')
+secret_key = os.getenv('AWS_SECRET_KEY')
+s3_client = boto3.client('s3',
+        aws_access_key_id=access_key,
+        aws_secret_access_key= secret_key,
+        region_name='us-east-1')
 
-def extract_data_from_api():
+bucket_name = 'weather-pipeline-kiman'
+
+def extract_data_from_api(s3_client, bucket_name):
     try:
-        load_dotenv(dot_env_loc)
         print('Start pull data')
         city = os.getenv('CITY')
         if not city:
@@ -19,8 +28,7 @@ def extract_data_from_api():
         api_key =os.getenv('API_KEY')
         if not api_key:
             raise ValueError('Not found API key !!!')
-        access_key = os.getenv('AWS_ACCESS_KEY')
-        secret_key = os.getenv('AWS_SECRET_KEY')
+        
         # 2. Lắp ráp đường link bằng f-string
         URL = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
 
@@ -32,16 +40,12 @@ def extract_data_from_api():
         data = json.loads((response.text))
 
         print('start push data to S3')
-        s3_client = boto3.client('s3',
-                                 aws_access_key_id=access_key,
-        aws_secret_access_key= secret_key,
-        region_name='us-east-1')
+        
         dt = data['dt']
         now = datetime.datetime.now()
         year = now.year
         month =now.month
         day = now.day
-        bucket_name = 'weather-pipeline-kiman'
         file_name_on_s3 = f'{city}/{year}/{month}/{day}/{dt}.json'
         s3_client.put_object(
         Bucket=bucket_name,
@@ -50,10 +54,16 @@ def extract_data_from_api():
         )
 
         print('Push to S3 successfull')
+        return {
+            'filename': file_name_on_s3
+        }
     except Exception as e :
         print(e)
         return False
     
 
 
-extract_data_from_api()
+file_name_on_s3 = extract_data_from_api(s3_client,bucket_name)
+
+print(file_name_on_s3)
+
