@@ -5,13 +5,21 @@ CREATE TABLE IF NOT EXISTS raw_weather_data (
     latitude DECIMAL(9, 6),
     longitude DECIMAL(9, 6),
     temperature DECIMAL(5, 2), -- (C or F)
+    pressure DECIMAL(10, 2), -- 
+    sea_level INTEGER,
+    grnd_level INTEGER,
     humidity INTEGER,          -- (%)
     wind_speed DECIMAL(5, 2),  -- 
+    wind_deg DECIMAL(5, 2),
+    wind_gust DECIMAL(5, 2),
+    clouds INTEGER,
     weather_condition VARCHAR(100), -- (example: Rain, Clear)
+    descriptions VARCHAR(200),
+    sunrise TIMESTAMP,
+    sunset TIMESTAMP,
+    timezone INTEGER,
     data_timestamp TIMESTAMP,  -- Time that the weather data was recorded
-    collected_at TIMESTAMP DEFAULT NOW(), --Time that the data was collected from the API
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Time that the data was inserted into db
-    raw_data JSON NOT NULL,
-    status_pipeline VARCHAR(20) DEFAULT 'SUCCESS'
+    collected_at TIMESTAMP DEFAULT NOW() --Time that the data was collected from the API
 );
+
 
