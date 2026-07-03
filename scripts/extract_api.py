@@ -9,24 +9,6 @@ import pandas as pd
 import psycopg2 
 import psycopg2.extras as extras
 
-curr_dir  = os.path.dirname(os.path.abspath(__file__))
-dot_env_loc = os.path.join(curr_dir , '../config/.env')
-load_dotenv(dot_env_loc)
-access_key = os.getenv('AWS_ACCESS_KEY')
-secret_key = os.getenv('AWS_SECRET_KEY')
-s3_client = boto3.client('s3',
-        aws_access_key_id=access_key,
-        aws_secret_access_key= secret_key,
-        region_name='us-east-1')
-
-bucket_name = 'weather-pipeline-kiman'
-
-
-db_username = os.getenv('DB_USERNAME')
-db_password = os.getenv('DB_PASSWORD')
-db_endpoint = os.getenv('DB_ENDPOINT')
-db_name =os.getenv('DB_NAME')
-db_port = os.getenv('DB_PORT')
 
 def extract_data_from_api(s3_client, bucket_name):
     try:
@@ -73,7 +55,6 @@ def extract_data_from_api(s3_client, bucket_name):
     
 
 
-file_name_on_s3 = extract_data_from_api(s3_client,bucket_name)
 
 
 def load_raw_data_db(s3_client , bucket_name, file_name):
@@ -109,9 +90,6 @@ def load_raw_data_db(s3_client , bucket_name, file_name):
     except Exception as e:
         print(e)
         return False
-
-if file_name_on_s3:
-    df = load_raw_data_db(s3_client= s3_client , bucket_name= bucket_name , file_name=file_name_on_s3['filename'])
 
 def load_to_rds(df , db_username , db_password , db_endpoint, db_name ,db_port):
     try:
@@ -191,6 +169,32 @@ def load_to_rds(df , db_username , db_password , db_endpoint, db_name ,db_port):
             cursor.close()
             conn.close()
             print("Successfull to close connection.")
-    
 
-load_to_rds(df,db_username , db_password , db_endpoint, db_name ,db_port)
+#================= RUN TEST FUNCTION =================
+
+# curr_dir  = os.path.dirname(os.path.abspath(__file__))
+# dot_env_loc = os.path.join(curr_dir , '../config/.env')
+# load_dotenv(dot_env_loc)
+# access_key = os.getenv('AWS_ACCESS_KEY')
+# secret_key = os.getenv('AWS_SECRET_KEY')
+# s3_client = boto3.client('s3',
+#         aws_access_key_id=access_key,
+#         aws_secret_access_key= secret_key,
+#         region_name='us-east-1')
+
+# bucket_name = 'weather-pipeline-kiman'
+
+# db_username = os.getenv('DB_USERNAME')
+# db_password = os.getenv('DB_PASSWORD')
+# db_endpoint = os.getenv('DB_ENDPOINT')
+# db_name =os.getenv('DB_NAME')
+# db_port = os.getenv('DB_PORT')
+    
+# file_name_on_s3 = extract_data_from_api(s3_client,bucket_name)
+
+
+# if file_name_on_s3:
+#     df = load_raw_data_db(s3_client= s3_client , bucket_name= bucket_name , file_name=file_name_on_s3['filename'])
+
+
+# load_to_rds(df,db_username , db_password , db_endpoint, db_name ,db_port)
