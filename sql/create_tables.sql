@@ -1,4 +1,6 @@
-CREATE TABLE IF NOT EXISTS raw_weather_data (
+CREATE Schema if NOT EXISTS bronze;
+
+CREATE TABLE IF NOT EXISTS bronze.raw_weather_data (
     id SERIAL PRIMARY KEY,
     city VARCHAR(100),
     country VARCHAR(50),
