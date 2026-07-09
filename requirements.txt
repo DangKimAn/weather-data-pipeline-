@@ -2,3 +2,6 @@ dotenv
 boto3
 pandas
 psycopg2-binary
+apache-airflow-providers-amazon
+apache-airflow-providers-postgres
+pendulum
